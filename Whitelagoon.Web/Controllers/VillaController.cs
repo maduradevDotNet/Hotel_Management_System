@@ -17,8 +17,8 @@ namespace Whitelagoon.Web.Controllers
 
         public IActionResult Index()
         {
-            var villas=_db.villas.ToList();
-            return View();
+            var villas =_db.villas.ToList();
+            return View(villas);
         }
     }
 }
