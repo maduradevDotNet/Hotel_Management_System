@@ -13,12 +13,24 @@ namespace Whitelagoon.Web.Controllers
             _db=db;
         }
 
-
-
         public IActionResult Index()
         {
             var villas =_db.villas.ToList();
             return View(villas);
+        }
+
+        public IActionResult Create() { 
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(Villa obj)
+        {
+            _db.villas.Add(obj);
+            _db.SaveChanges();
+
+            return RedirectToAction("Index");
         }
     }
 }
