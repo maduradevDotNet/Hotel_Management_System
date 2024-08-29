@@ -27,10 +27,19 @@ namespace Whitelagoon.Web.Controllers
         [HttpPost]
         public IActionResult Create(Villa obj)
         {
-            _db.villas.Add(obj);
-            _db.SaveChanges();
+            if (obj.Name == obj.Description) {
+                ModelState.AddModelError("","The Description Can not Exactly math the Name");
+            }
 
-            return RedirectToAction("Index");
+
+            if (ModelState.IsValid)
+            {
+                _db.villas.Add(obj);
+                _db.SaveChanges();
+
+                return RedirectToAction("Index");
+            }
+            return View(obj);
         }
     }
 }
