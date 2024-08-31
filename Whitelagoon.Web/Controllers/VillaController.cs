@@ -47,7 +47,12 @@ namespace Whitelagoon.Web.Controllers
         {
             Villa? obj=_db.villas.FirstOrDefault(u=>u.Id == villaId);
 
-            return View();
+            if (obj == null) {
+
+                return RedirectToAction("Error","Home");
+            }
+
+            return View(obj);
         }
 
         [HttpPost]
