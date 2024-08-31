@@ -28,7 +28,7 @@ namespace Whitelagoon.Web.Controllers
         public IActionResult Create(Villa obj)
         {
             if (obj.Name == obj.Description) {
-                ModelState.AddModelError("","The Description Can not Exactly math the Name");
+                ModelState.AddModelError("Name", "The Description Can not Exactly math the Name");
             }
 
 
@@ -41,5 +41,34 @@ namespace Whitelagoon.Web.Controllers
             }
             return View(obj);
         }
+
+
+        public IActionResult Update(int villaId)
+        {
+            Villa? obj=_db.villas.FirstOrDefault(u=>u.Id == villaId);
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Update(Villa obj)
+        {
+            if (obj.Name == obj.Description)
+            {
+                ModelState.AddModelError("Name", "The Description Can not Exactly math the Name");
+            }
+
+
+            if (ModelState.IsValid)
+            {
+                _db.villas.Add(obj);
+                _db.SaveChanges();
+
+                return RedirectToAction("Index");
+            }
+            return View(obj);
+        }
+
+
     }
 }
