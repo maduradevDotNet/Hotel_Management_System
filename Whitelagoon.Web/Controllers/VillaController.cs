@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Infrastructure.Data;
 
@@ -19,7 +20,7 @@ namespace Whitelagoon.Web.Controllers
             return View(villas);
         }
 
-        public IActionResult Create() { 
+        public IActionResult Create() {
 
             return View();
         }

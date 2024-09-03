@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Infrastructure.Data;
 
@@ -19,24 +20,26 @@ namespace Whitelagoon.Web.Controllers
             return View(villaNumbers);
         }
 
-        public IActionResult Create() { 
+        public IActionResult Create() {
+            IEnumerable<SelectListItem> list = _db.villas.ToList().Select(u => new SelectListItem
+            {
+                Text = u.Name,
+                Value = u.Id.ToString()
+            });
+
+            ViewData["list"] = list;
 
             return View();
         }
 
         [HttpPost]
-        public IActionResult Create(Villa obj)
+        public IActionResult Create(VillaNumber obj)
         {
-            if (obj.Name == obj.Description) {
-                ModelState.AddModelError("Name", "The Description Can not Exactly math the Name");
-            }
-
-
             if (ModelState.IsValid)
             {
-                _db.villas.Add(obj);
+                _db.VillaNumbers.Add(obj);
                 _db.SaveChanges();
-                TempData["success"] = "Villa Data Created Successfully";
+                TempData["success"] = "The Villa Number  Created Successfully";
                 return RedirectToAction("Index");
             }
             TempData["error"] = "Villa Data Created UnSuccessfully";
