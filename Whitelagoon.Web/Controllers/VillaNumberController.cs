@@ -83,43 +83,61 @@ namespace Whitelagoon.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Update(Villa obj)
+        public IActionResult Update(VillaNumberVM villaNumberVM)
         {
-            if (ModelState.IsValid && obj.Id>0)
+
+            if (ModelState.IsValid)
             {
-                _db.villas.Update(obj);
+                _db.VillaNumbers.Update(villaNumberVM.VillaNumber);
                 _db.SaveChanges();
-                TempData["success"] = "Villa Data Updated Successfully";
+                TempData["success"] = "The Villa Number  Updated Successfully";
                 return RedirectToAction("Index");
             }
-            TempData["error"] = "Villa Data Updated UnSuccessfully";
-            return View(obj);
+
+
+            villaNumberVM.VillaList = _db.villas.ToList().Select(u => new SelectListItem
+            {
+                Text = u.Name,
+                Value = u.Id.ToString()
+            });
+
+            return View(villaNumberVM);
         }
 
 
 
-        public IActionResult Delete(int villaId)
+        public IActionResult Delete(int villaNumberId)
         {
-            Villa? obj = _db.villas.FirstOrDefault(u => u.Id == villaId);
+            VillaNumberVM villaNumberVM = new()
+            {
+                VillaList = _db.villas.ToList().Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                }),
+                VillaNumber = _db.VillaNumbers.FirstOrDefault(u => u.Villa_Number == villaNumberId)
+            };
 
-            if (obj == null)
+
+            if (villaNumberVM.VillaNumber == null)
             {
 
                 return RedirectToAction("Error", "Home");
             }
 
-            return View(obj);
+            return View(villaNumberVM);
         }
 
+
         [HttpPost]
-        public IActionResult Delete(int? villaId)
+        public IActionResult Delete(VillaNumberVM villaNumberVM)
         {
             if (ModelState.IsValid)
             {
-                Villa? obj=_db.villas.FirstOrDefault(u=>u.Id == villaId);
-                _db.villas.Remove(obj);
+                VillaNumber? obj=_db.VillaNumbers.FirstOrDefault(u=>u.Villa_Number == villaNumberVM.VillaNumber.Villa_Number);
+                _db.VillaNumbers.Remove(obj);
                 _db.SaveChanges();
-                TempData["success"] = "Villa Data deleted Successfully"; 
+                TempData["success"] = "The Villa Number Data deleted Successfully"; 
                 return RedirectToAction("Index");
             }
             TempData["error"] = "Villa Data deleted UnSuccessfully";
