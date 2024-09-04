@@ -38,7 +38,7 @@ namespace Whitelagoon.Web.Controllers
                 _db.villas.Add(obj);
                 _db.SaveChanges();
                 TempData["success"] = "Villa Data Created Successfully";
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
             TempData["error"] = "Villa Data Created UnSuccessfully";
             return View(obj);
@@ -65,7 +65,7 @@ namespace Whitelagoon.Web.Controllers
                 _db.villas.Update(obj);
                 _db.SaveChanges();
                 TempData["success"] = "Villa Data Updated Successfully";
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
             TempData["error"] = "Villa Data Updated UnSuccessfully";
             return View(obj);
@@ -95,7 +95,7 @@ namespace Whitelagoon.Web.Controllers
                 _db.villas.Remove(obj);
                 _db.SaveChanges();
                 TempData["success"] = "Villa Data deleted Successfully"; 
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
             TempData["error"] = "Villa Data deleted UnSuccessfully";
             return View();
