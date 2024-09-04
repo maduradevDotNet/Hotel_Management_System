@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Whitelagoon.Web.ViewModel;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Infrastructure.Data;
 
@@ -16,47 +18,68 @@ namespace Whitelagoon.Web.Controllers
 
         public IActionResult Index()
         {
-            var villaNumbers = _db.VillaNumbers.ToList();
+            var villaNumbers = _db.VillaNumbers.Include(u=>u.Villa).ToList();
             return View(villaNumbers);
         }
 
         public IActionResult Create() {
-            IEnumerable<SelectListItem> list = _db.villas.ToList().Select(u => new SelectListItem
+
+            VillaNumberVM villaNumberVM = new()
             {
-                Text = u.Name,
-                Value = u.Id.ToString()
-            });
+                VillaList = _db.villas.ToList().Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                })
+            };
 
-            ViewData["list"] = list;
-
-            return View();
+            return View(villaNumberVM);
         }
 
         [HttpPost]
-        public IActionResult Create(VillaNumber obj)
+        public IActionResult Create(VillaNumberVM obj)
         {
-            if (ModelState.IsValid)
+           
+
+            bool RoomNumberExists=_db.VillaNumbers.Any(u=>u.Villa_Number==obj.VillaNumber.Villa_Number);
+
+            if (ModelState.IsValid && !RoomNumberExists)
             {
-                _db.VillaNumbers.Add(obj);
+                _db.VillaNumbers.Add(obj.VillaNumber);
                 _db.SaveChanges();
                 TempData["success"] = "The Villa Number  Created Successfully";
                 return RedirectToAction("Index");
             }
-            TempData["error"] = "Villa Data Created UnSuccessfully";
+
+
+            if (RoomNumberExists)
+            {
+                TempData["error"] = "The Villa Number Already Exist!";
+            }
+            
             return View(obj);
         }
 
 
-        public IActionResult Update(int villaId)
+        public IActionResult Update(int villaNumberId)
         {
-            Villa? obj=_db.villas.FirstOrDefault(u=>u.Id == villaId);
+            VillaNumberVM villaNumberVM = new()
+            {
+                VillaList = _db.villas.ToList().Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                }),
+                VillaNumber=_db.VillaNumbers.FirstOrDefault(u=>u.Villa_Number== villaNumberId)
+            };
 
-            if (obj == null) {
+
+            if (villaNumberVM.VillaNumber == null) {
 
                 return RedirectToAction("Error","Home");
             }
 
-            return View(obj);
+            return View(villaNumberVM);
         }
 
         [HttpPost]
