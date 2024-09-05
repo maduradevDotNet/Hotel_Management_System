@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using WhiteLagoon.Application.Common.Interfaces;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Infrastructure.Data;
 
@@ -7,16 +8,16 @@ namespace Whitelagoon.Web.Controllers
 {
     public class VillaController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IVillaRepository  _villaService;
 
-        public VillaController(ApplicationDbContext db)
+        public VillaController(IVillaRepository villaService)
         {
-            _db=db;
+            _villaService = villaService;
         }
 
         public IActionResult Index()
         {
-            var villas =_db.villas.ToList();
+            var villas = _villaService.GetAll();
             return View(villas);
         }
 
@@ -28,76 +29,73 @@ namespace Whitelagoon.Web.Controllers
         [HttpPost]
         public IActionResult Create(Villa obj)
         {
-            if (obj.Name == obj.Description) {
-                ModelState.AddModelError("Name", "The Description Can not Exactly math the Name");
+            if (obj.Name == obj.Description)
+            {
+                ModelState.AddModelError("name", "The description cannot exactly match the Name.");
             }
-
-
             if (ModelState.IsValid)
             {
-                _db.villas.Add(obj);
-                _db.SaveChanges();
-                TempData["success"] = "Villa Data Created Successfully";
+
+                _villaService.Add(obj);
+                _villaService.Save();
+                TempData["success"] = "The villa has been created successfully.";
                 return RedirectToAction(nameof(Index));
             }
-            TempData["error"] = "Villa Data Created UnSuccessfully";
-            return View(obj);
+            return View();
         }
 
 
         public IActionResult Update(int villaId)
         {
-            Villa? obj=_db.villas.FirstOrDefault(u=>u.Id == villaId);
-
-            if (obj == null) {
-
-                return RedirectToAction("Error","Home");
+            Villa? obj = _villaService.Get(u=>u.Id==villaId);
+            if (obj == null)
+            {
+                return RedirectToAction("Error", "Home");
             }
-
             return View(obj);
         }
 
         [HttpPost]
         public IActionResult Update(Villa obj)
         {
-            if (ModelState.IsValid && obj.Id>0)
+            if (ModelState.IsValid && obj.Id > 0)
             {
-                _db.villas.Update(obj);
-                _db.SaveChanges();
-                TempData["success"] = "Villa Data Updated Successfully";
+
+                _villaService.Update(obj);
+                _villaService.Save();
+                TempData["success"] = "The villa has been updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
-            TempData["error"] = "Villa Data Updated UnSuccessfully";
-            return View(obj);
+            return View();
         }
 
 
 
         public IActionResult Delete(int villaId)
         {
-            Villa? obj = _db.villas.FirstOrDefault(u => u.Id == villaId);
-
-            if (obj == null)
+            Villa? obj = _villaService.Get(u=>u.Id==villaId);
+            if (obj is null)
             {
-
                 return RedirectToAction("Error", "Home");
             }
-
             return View(obj);
         }
 
         [HttpPost]
-        public IActionResult Delete(int? villaId)
+        public IActionResult Delete(Villa obj)
         {
-            if (ModelState.IsValid)
+            Villa? objFromDb = _villaService.Get(u => u.Id == obj.Id);
+            if (objFromDb is not null)
             {
-                Villa? obj=_db.villas.FirstOrDefault(u=>u.Id == villaId);
-                _db.villas.Remove(obj);
-                _db.SaveChanges();
-                TempData["success"] = "Villa Data deleted Successfully"; 
+                _villaService.Remove(objFromDb);
+                _villaService.Save();
+                TempData["success"] = "The villa has been deleted successfully.";
                 return RedirectToAction(nameof(Index));
             }
-            TempData["error"] = "Villa Data deleted UnSuccessfully";
+            else
+            {
+                TempData["error"] = "Failed to delete the villa.";
+            }
             return View();
         }
     }
