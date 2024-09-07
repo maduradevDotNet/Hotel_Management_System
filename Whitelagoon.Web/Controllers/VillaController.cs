@@ -41,12 +41,12 @@ namespace Whitelagoon.Web.Controllers
                 if (obj.Image!=null)
                 {
                     string fileName=Guid.NewGuid().ToString()+Path.GetExtension(obj.Image.FileName) ;
-                    string imagePath = Path.Combine(_WebHostEnvironment.WebRootPath, @"/images/VillaImage");
+                    string imagePath = Path.Combine(_WebHostEnvironment.WebRootPath, @"images\VillaImage");
 
-                    using (var fileStream=new FileStream(Path.Combine(imagePath, fileName),FileMode.Create))
-                    {
+                    using var fileStream = new FileStream(Path.Combine(imagePath, fileName), FileMode.Create) ;
                         obj.Image.CopyTo(fileStream);
-                    }
+
+                    obj.ImageUrl = @"\images\VillaImage\" + fileName;
 
                 }
                 else
@@ -79,6 +79,34 @@ namespace Whitelagoon.Web.Controllers
         {
             if (ModelState.IsValid && obj.Id > 0)
             {
+                if (obj.Image != null)
+                {
+
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(obj.Image.FileName);
+                    string imagePath = Path.Combine(_WebHostEnvironment.WebRootPath, @"images\VillaImage");
+
+                    if (!string.IsNullOrEmpty(obj.ImageUrl))
+                    {
+                        var oldImagePath=Path.Combine(_WebHostEnvironment.WebRootPath,obj.ImageUrl.TrimStart('\\')):
+
+                        if (System.IO.File.Exists(imagePath))
+                        {
+                            System.IO.File.Delete(imagePath);
+                        }
+                    }
+
+                    using var fileStream = new FileStream(Path.Combine(imagePath, fileName), FileMode.Create);
+                    obj.Image.CopyTo(fileStream);
+
+                    obj.ImageUrl = @"\images\VillaImage\" + fileName;
+
+                }
+                //else
+                //{
+                //    obj.ImageUrl = "/images/placeholder.png";
+
+                //}
+
 
                 _UnitOfWork.Villa.Update(obj);
                 _UnitOfWork.Save();
