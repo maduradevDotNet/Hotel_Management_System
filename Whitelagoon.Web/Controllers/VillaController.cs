@@ -74,6 +74,44 @@ namespace Whitelagoon.Web.Controllers
             return View(obj);
         }
 
+        //[HttpPost]
+        //public IActionResult Update(Villa obj)
+        //{ 
+        //    if (ModelState.IsValid && obj.Id > 0)
+        //    {
+        //        if (obj.Image != null)
+        //        {
+
+        //            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(obj.Image.FileName);
+        //            string imagePath = Path.Combine(_WebHostEnvironment.WebRootPath, @"images\VillaImage");
+
+        //            if (!string.IsNullOrEmpty(obj.ImageUrl))
+        //            {
+        //               var oldImagePath = Path.Combine(_WebHostEnvironment.WebRootPath, obj.ImageUrl.TrimStart('\\')):
+
+
+        //                if (System.IO.File.Exists(imagePath))
+        //                { 
+        //                    System.IO.File.Delete(imagePath);
+        //                }
+        //            }
+
+        //            using var fileStream = new FileStream(Path.Combine(imagePath, fileName), FileMode.Create);
+        //            obj.Image.CopyTo(fileStream);
+
+        //            obj.ImageUrl = @"\images\VillaImage\" + fileName;
+
+        //        }
+
+        //        _UnitOfWork.Villa.Update(obj);
+        //        _UnitOfWork.Save();
+        //        TempData["success"] = "The villa has been updated successfully.";
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    return View();
+        //}
+
+
         [HttpPost]
         public IActionResult Update(Villa obj)
         {
@@ -81,38 +119,38 @@ namespace Whitelagoon.Web.Controllers
             {
                 if (obj.Image != null)
                 {
-
+                    // Generate new file name
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(obj.Image.FileName);
                     string imagePath = Path.Combine(_WebHostEnvironment.WebRootPath, @"images\VillaImage");
 
+                    // Check if there's an existing image and delete it
                     if (!string.IsNullOrEmpty(obj.ImageUrl))
                     {
-                        var oldImagePath=Path.Combine(_WebHostEnvironment.WebRootPath,obj.ImageUrl.TrimStart('\\')):
+                        var oldImagePath = Path.Combine(_WebHostEnvironment.WebRootPath, obj.ImageUrl.TrimStart('\\'));
 
-                        if (System.IO.File.Exists(imagePath))
+                        // Check if the old image exists and delete it
+                        if (System.IO.File.Exists(oldImagePath))
                         {
-                            System.IO.File.Delete(imagePath);
+                            System.IO.File.Delete(oldImagePath);
                         }
                     }
 
+                    // Upload the new image
                     using var fileStream = new FileStream(Path.Combine(imagePath, fileName), FileMode.Create);
                     obj.Image.CopyTo(fileStream);
 
+                    // Update the image URL in the object
                     obj.ImageUrl = @"\images\VillaImage\" + fileName;
-
                 }
-                //else
-                //{
-                //    obj.ImageUrl = "/images/placeholder.png";
 
-                //}
-
-
+                // Update villa and save changes
                 _UnitOfWork.Villa.Update(obj);
                 _UnitOfWork.Save();
                 TempData["success"] = "The villa has been updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
+
+            // If model is invalid, return the view
             return View();
         }
 
