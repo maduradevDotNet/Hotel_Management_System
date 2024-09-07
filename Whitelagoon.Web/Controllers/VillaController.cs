@@ -1,5 +1,6 @@
 ﻿ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.IO;
 using WhiteLagoon.Application.Common.Interfaces;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Infrastructure.Data;
@@ -9,10 +10,12 @@ namespace Whitelagoon.Web.Controllers
     public class VillaController : Controller
     {
         private readonly IUnitOfWork _UnitOfWork;
+        private readonly IWebHostEnvironment _WebHostEnvironment;
 
-        public VillaController(IUnitOfWork UnitOfWork)
+        public VillaController(IUnitOfWork UnitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _UnitOfWork = UnitOfWork;
+            _WebHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index()
@@ -35,6 +38,22 @@ namespace Whitelagoon.Web.Controllers
             }
             if (ModelState.IsValid)
             {
+                if (obj.Image!=null)
+                {
+                    string fileName=Guid.NewGuid().ToString()+Path.GetExtension(obj.Image.FileName) ;
+                    string imagePath = Path.Combine(_WebHostEnvironment.WebRootPath, @"/images/VillaImage");
+
+                    using (var fileStream=new FileStream(Path.Combine(imagePath, fileName),FileMode.Create))
+                    {
+                        obj.Image.CopyTo(fileStream);
+                    }
+
+                }
+                else
+                {
+                    obj.ImageUrl = "/images/placeholder.png";
+
+                }
 
                 _UnitOfWork.Villa.Add(obj);
                 _UnitOfWork.Save();

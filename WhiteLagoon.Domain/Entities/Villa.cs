@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace WhiteLagoon.Domain.Entities
 {
@@ -24,6 +25,9 @@ namespace WhiteLagoon.Domain.Entities
 
         [Range(1, 10)]
         public int Occupancy { get; set; }
+
+        [NotMapped]
+        public IFormFile? Image { get; set; }
 
         [Display(Name = "Image Url")]
         public string? ImageUrl { get; set; }
